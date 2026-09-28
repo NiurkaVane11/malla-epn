@@ -32,16 +32,16 @@ export default function IraPeriodos() {
   const registrados = PERIODOS.filter((p) => iraPeriodos[p] !== undefined);
 
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <h2 className="text-sm font-semibold text-slate-900">IRA por período</h2>
+    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-[#001F3F]/10">
+      <h2 className="text-sm font-semibold text-[#001F3F]">IRA por período</h2>
 
       <form onSubmit={guardar} className="mt-3 space-y-3">
-        <label className="block text-sm text-slate-700">
+        <label className="block text-sm text-[#001F3F]/80">
           En el período{" "}
           <select
             value={periodo}
             onChange={(e) => setPeriodo(e.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-2 py-1 font-medium"
+            className="rounded-md border border-[#1E488F]/40 bg-[#F6F7ED] px-2 py-1 font-medium text-[#001F3F]"
           >
             {PERIODOS.map((p) => (
               <option key={p} value={p}>
@@ -57,11 +57,11 @@ export default function IraPeriodos() {
             value={valor}
             onChange={(e) => setValor(e.target.value)}
             placeholder="Ej. 26.60"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            className="w-full rounded-md border border-[#1E488F]/40 px-3 py-2 text-sm text-[#001F3F] focus:border-[#1E488F] focus:outline-none focus:ring-2 focus:ring-[#1E488F]/20"
           />
           <button
             type="submit"
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            className="rounded-md bg-[#1E488F] px-4 py-2 text-sm font-medium text-white hover:bg-[#001F3F]"
           >
             Guardar
           </button>
@@ -70,17 +70,17 @@ export default function IraPeriodos() {
       </form>
 
       <div className="mt-5">
-        <h3 className="text-xs font-medium uppercase tracking-wide text-slate-500">Historial</h3>
+        <h3 className="text-xs font-medium uppercase tracking-wide text-[#001F3F]/60">Historial</h3>
         {registrados.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">Aún no registras ningún período.</p>
+          <p className="mt-2 text-sm text-[#001F3F]/60">Aún no registras ningún período.</p>
         ) : (
           <ul className="mt-2 space-y-2">
             {registrados.map((p) => (
-              <li key={p} className="flex items-center gap-3 text-sm">
-                <span className="w-16 shrink-0 font-medium text-slate-700">{p}</span>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <li key={p} className="flex items-center gap-3 text-sm text-[#001F3F]">
+                <span className="w-16 shrink-0 font-medium">{p}</span>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#001F3F]/10">
                   <div
-                    className="h-full rounded-full bg-indigo-500"
+                    className="h-full rounded-full bg-[#1E488F]"
                     style={{ width: `${(iraPeriodos[p] / 40) * 100}%` }}
                   />
                 </div>
@@ -89,7 +89,7 @@ export default function IraPeriodos() {
                   type="button"
                   onClick={() => borrarIra(p)}
                   aria-label={`Borrar ${p}`}
-                  className="text-slate-400 hover:text-red-600"
+                  className="text-[#001F3F]/40 hover:text-red-600"
                 >
                   ✕
                 </button>

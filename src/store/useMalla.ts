@@ -4,9 +4,11 @@ import type { Estado, Estados } from "../lib/disponibles";
 
 type MallaState = {
   estados: Estados;
+  requisitos: Record<string, boolean>;
   iraPeriodos: Record<string, number>;
   setEstado: (id: string, estado: Estado) => void;
-  cargarAprobadas: (ids: string[]) => void;
+  toggleRequisito: (id: string) => void;
+  cargarAvance: (aprobadas: string[], requisitos: string[]) => void;
   setIra: (periodo: string, valor: number) => void;
   borrarIra: (periodo: string) => void;
   reiniciar: () => void;
@@ -16,6 +18,7 @@ export const useMalla = create<MallaState>()(
   persist(
     (set) => ({
       estados: {},
+      requisitos: {},
       iraPeriodos: {},
       setEstado: (id, estado) =>
         set((s) => {
@@ -24,11 +27,15 @@ export const useMalla = create<MallaState>()(
           else estados[id] = estado;
           return { estados };
         }),
-      cargarAprobadas: (ids) =>
+      toggleRequisito: (id) =>
+        set((s) => ({ requisitos: { ...s.requisitos, [id]: !s.requisitos?.[id] } })),
+      cargarAvance: (aprobadas, requisitos) =>
         set((s) => {
           const estados = { ...s.estados };
-          for (const id of ids) estados[id] = "aprobada";
-          return { estados };
+          for (const id of aprobadas) estados[id] = "aprobada";
+          const reqs = { ...s.requisitos };
+          for (const id of requisitos) reqs[id] = true;
+          return { estados, requisitos: reqs };
         }),
       setIra: (periodo, valor) =>
         set((s) => ({ iraPeriodos: { ...s.iraPeriodos, [periodo]: valor } })),
@@ -38,7 +45,7 @@ export const useMalla = create<MallaState>()(
           delete iraPeriodos[periodo];
           return { iraPeriodos };
         }),
-      reiniciar: () => set({ estados: {} }), // el historial de IRA se conserva
+      reiniciar: () => set({ estados: {}, requisitos: {} }), // el historial de IRA se conserva
     }),
     { name: "malla-epn" }
   )

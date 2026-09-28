@@ -1,25 +1,33 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Estado, Estados } from "../lib/disponibles";
+import { validarRespaldo } from "../lib/respaldo";
+import type { Respaldo } from "../lib/respaldo";
 
 type MallaState = {
   estados: Estados;
   requisitos: Record<string, boolean>;
   iraPeriodos: Record<string, number>;
+  usarPisos: boolean;
   setEstado: (id: string, estado: Estado) => void;
+  marcarCursando: (ids: string[]) => void;
   toggleRequisito: (id: string) => void;
+  setUsarPisos: (v: boolean) => void;
   cargarAvance: (aprobadas: string[], requisitos: string[]) => void;
   setIra: (periodo: string, valor: number) => void;
   borrarIra: (periodo: string) => void;
+  exportar: () => Respaldo;
+  importar: (datos: unknown) => boolean;
   reiniciar: () => void;
 };
 
 export const useMalla = create<MallaState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       estados: {},
       requisitos: {},
       iraPeriodos: {},
+      usarPisos: true,
       setEstado: (id, estado) =>
         set((s) => {
           const estados = { ...s.estados };
@@ -27,8 +35,15 @@ export const useMalla = create<MallaState>()(
           else estados[id] = estado;
           return { estados };
         }),
+      marcarCursando: (ids) =>
+        set((s) => {
+          const estados = { ...s.estados };
+          for (const id of ids) if (!estados[id]) estados[id] = "cursando";
+          return { estados };
+        }),
       toggleRequisito: (id) =>
         set((s) => ({ requisitos: { ...s.requisitos, [id]: !s.requisitos?.[id] } })),
+      setUsarPisos: (v) => set({ usarPisos: v }),
       cargarAvance: (aprobadas, requisitos) =>
         set((s) => {
           const estados = { ...s.estados };
@@ -45,6 +60,16 @@ export const useMalla = create<MallaState>()(
           delete iraPeriodos[periodo];
           return { iraPeriodos };
         }),
+      exportar: () => {
+        const s = get();
+        return { version: 1, estados: s.estados, requisitos: s.requisitos, iraPeriodos: s.iraPeriodos };
+      },
+      importar: (datos) => {
+        const r = validarRespaldo(datos);
+        if (!r) return false;
+        set({ estados: r.estados, requisitos: r.requisitos, iraPeriodos: r.iraPeriodos });
+        return true;
+      },
       reiniciar: () => set({ estados: {}, requisitos: {} }), // el historial de IRA se conserva
     }),
     { name: "malla-epn" }

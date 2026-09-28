@@ -19,22 +19,27 @@ type Props = {
   materia: Materia;
   estado: Estado;
   disponible: boolean;
+  motivo: string | null;
   faltantes: string[];
+  incumplida: boolean;
   onCambiar: (estado: Estado) => void;
 };
 
-export default function MateriaCard({ materia, estado, disponible, faltantes, onCambiar }: Props) {
+export default function MateriaCard({ materia, estado, disponible, motivo, faltantes, incumplida, onCambiar }: Props) {
   const bloqueada = estado === "pendiente" && !disponible;
-  const clases = bloqueada
-    ? "bg-[#F6F7ED] border-[#001F3F]/10 text-[#001F3F]/40"
-    : COLOR[estado];
+  const clases = bloqueada ? "bg-[#F6F7ED] border-[#001F3F]/10 text-[#001F3F]/40" : COLOR[estado];
+  const ayuda = bloqueada
+    ? motivo ?? materia.id
+    : faltantes.length
+    ? `Correquisitos pendientes: ${faltantes.join(", ")}`
+    : materia.id;
 
   return (
     <button
       type="button"
       disabled={bloqueada}
       onClick={() => onCambiar(SIGUIENTE[estado])}
-      title={faltantes.length ? `Correquisitos pendientes: ${faltantes.join(", ")}` : materia.id}
+      title={ayuda}
       className={`w-full rounded-lg border p-2.5 text-left text-xs transition ${clases} ${
         bloqueada ? "cursor-not-allowed" : "cursor-pointer hover:-translate-y-0.5 hover:shadow-md"
       }`}
@@ -44,6 +49,9 @@ export default function MateriaCard({ materia, estado, disponible, faltantes, on
         <span>{materia.id}</span>
         <span>{materia.creditos} cr</span>
       </div>
+      {incumplida && (
+        <div className="mt-1 text-[10px] font-semibold text-red-700">⚠ Prerrequisito sin aprobar</div>
+      )}
       {faltantes.length > 0 && !bloqueada && estado === "pendiente" && (
         <div className="mt-1 text-[10px] font-medium text-[#1E488F]">Requiere correquisito</div>
       )}

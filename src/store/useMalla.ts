@@ -4,10 +4,14 @@ import type { Estado, Estados } from "../lib/disponibles";
 import { validarRespaldo } from "../lib/respaldo";
 import type { Respaldo } from "../lib/respaldo";
 
+export type Bimestres = { b1: number | null; b2: number | null };
+type Notas = Record<string, Bimestres>;
+
 type MallaState = {
   estados: Estados;
   requisitos: Record<string, boolean>;
   iraPeriodos: Record<string, number>;
+  notas: Notas;
   usarPisos: boolean;
   setEstado: (id: string, estado: Estado) => void;
   marcarCursando: (ids: string[]) => void;
@@ -16,6 +20,7 @@ type MallaState = {
   cargarAvance: (aprobadas: string[], requisitos: string[]) => void;
   setIra: (periodo: string, valor: number) => void;
   borrarIra: (periodo: string) => void;
+  setNota: (id: string, bimestre: "b1" | "b2", valor: number | null) => void;
   exportar: () => Respaldo;
   importar: (datos: unknown) => boolean;
   reiniciar: () => void;
@@ -27,6 +32,7 @@ export const useMalla = create<MallaState>()(
       estados: {},
       requisitos: {},
       iraPeriodos: {},
+      notas: {},
       usarPisos: true,
       setEstado: (id, estado) =>
         set((s) => {
@@ -60,17 +66,21 @@ export const useMalla = create<MallaState>()(
           delete iraPeriodos[periodo];
           return { iraPeriodos };
         }),
+      setNota: (id, bimestre, valor) =>
+        set((s) => ({
+          notas: { ...s.notas, [id]: { ...(s.notas[id] ?? { b1: null, b2: null }), [bimestre]: valor } },
+        })),
       exportar: () => {
         const s = get();
-        return { version: 1, estados: s.estados, requisitos: s.requisitos, iraPeriodos: s.iraPeriodos };
+        return { version: 1, estados: s.estados, requisitos: s.requisitos, iraPeriodos: s.iraPeriodos, notas: s.notas };
       },
       importar: (datos) => {
         const r = validarRespaldo(datos);
         if (!r) return false;
-        set({ estados: r.estados, requisitos: r.requisitos, iraPeriodos: r.iraPeriodos });
+        set({ estados: r.estados, requisitos: r.requisitos, iraPeriodos: r.iraPeriodos, notas: r.notas ?? {} });
         return true;
       },
-      reiniciar: () => set({ estados: {}, requisitos: {} }), // el historial de IRA se conserva
+      reiniciar: () => set({ estados: {}, requisitos: {} }), // el historial de IRA y las notas se conservan
     }),
     { name: "malla-epn" }
   )

@@ -1,19 +1,19 @@
 export type Base = { promedio: number; aprobados: number; reprobados: number };
 export type Cursada = { nota: number; creditos: number };
 
-// Datos del currículum: promedio /40, créditos aprobados y reprobados.
+// Datos de tu currículum: promedio /40, créditos aprobados y reprobados.
 export const BASE_INICIAL: Base = { promedio: 30.63, aprobados: 66, reprobados: 10 };
 
-// Nota mínima para aprobar (sobre 40). Es coherente con tus datos, pero confírmala en tu reglamento.
-export const MINIMO_APROBAR = 28;
+// Nota mínima para aprobar según el Reglamento de Régimen Académico de la EPN (Art. 44): 24/40.
+export const MINIMO_APROBAR = 24;
 
-// IRA = promedio ponderado × aprobados / (aprobados + reprobados)
+// IRA = tu promedio ponderado de notas × (créditos aprobados ÷ créditos que has intentado)
 export function calcularIra(b: Base): number {
-  const total = b.aprobados + b.reprobados;
-  return total === 0 ? 0 : (b.promedio * b.aprobados) / total;
+  const intentados = b.aprobados + b.reprobados;
+  return intentados === 0 ? 0 : (b.promedio * b.aprobados) / intentados;
 }
 
-// Añade materias cursadas: las aprobadas entran al promedio, las reprobadas suman a "reprobados".
+// Suma materias nuevas: si aprueban, entran al promedio; si no, solo suman a "reprobados".
 export function proyectar(base: Base, cursadas: Cursada[], minimo = MINIMO_APROBAR): Base {
   let suma = base.promedio * base.aprobados;
   let ap = base.aprobados;

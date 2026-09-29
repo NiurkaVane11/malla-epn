@@ -5,8 +5,7 @@ import { MATERIAS } from "../data/malla";
 import { creditosDe, disponibles, estadoDe } from "../lib/disponibles";
 import { useMalla } from "../store/useMalla";
 
-// Ajusta este tope según tu reglamento; es un valor de referencia, no lo verifiqué.
-export const MAX_CREDITOS = 18;
+export const MAX_CREDITOS = 15;
 
 const nombreDe = (id: string) => MATERIAS.find((m) => m.id === id)?.nombre ?? id;
 

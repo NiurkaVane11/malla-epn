@@ -6,13 +6,7 @@ import { AVANCE_APROBADAS } from "../data/avance";
 import { REQUISITOS_CUMPLIDOS } from "../data/requisitos";
 import { useMalla } from "../store/useMalla";
 import {
-  correquisitosFaltantes,
-  creditosDe,
-  dependientes,
-  estadoDe,
-  incumplidas,
-  motivoBloqueo,
-  puedeTomar,
+  correquisitosFaltantes, creditosDe, dependientes, estadoDe, incumplidas, motivoBloqueo, puedeTomar,
 } from "../lib/disponibles";
 import type { Estado } from "../lib/disponibles";
 import MateriaCard from "./MateriaCard";
@@ -28,6 +22,8 @@ const NIVELES = Array.from({ length: 9 }, (_, i) => i + 1);
 
 export default function Malla() {
   const estados = useMalla((s) => s.estados);
+  const notas = useMalla((s) => s.notas);
+  const setNota = useMalla((s) => s.setNota);
   const usarPisos = useMalla((s) => s.usarPisos);
   const setUsarPisos = useMalla((s) => s.setUsarPisos);
   const setEstado = useMalla((s) => s.setEstado);
@@ -65,33 +61,17 @@ export default function Malla() {
             <p className="text-xs text-[#DBE64C]">Ingeniería de Software · EPN</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <label
-              className="flex cursor-pointer items-center gap-2 text-xs"
-              title="Bloquea materias hasta tener los créditos aprobados del piso de su nivel"
-            >
-              <input
-                type="checkbox"
-                checked={usarPisos}
-                onChange={(e) => setUsarPisos(e.target.checked)}
-                className="h-4 w-4 accent-[#DBE64C]"
-              />
+            <label className="flex cursor-pointer items-center gap-2 text-xs" title="Bloquea materias hasta tener los créditos aprobados del piso de su nivel">
+              <input type="checkbox" checked={usarPisos} onChange={(e) => setUsarPisos(e.target.checked)} className="h-4 w-4 accent-[#DBE64C]" />
               Aplicar pisos
             </label>
-            <button
-              type="button"
-              onClick={() =>
-                confirm("Esto marca 24 materias y 5 requisitos como cumplidos según tu currículum. ¿Continuar?") &&
-                cargarAvance(AVANCE_APROBADAS, REQUISITOS_CUMPLIDOS)
-              }
-              className="rounded-md bg-[#DBE64C] px-3 py-1.5 text-sm font-semibold text-[#001F3F] hover:bg-[#74C365]"
-            >
+            <button type="button"
+              onClick={() => confirm("Esto marca 24 materias y 5 requisitos como cumplidos según tu currículum. ¿Continuar?") && cargarAvance(AVANCE_APROBADAS, REQUISITOS_CUMPLIDOS)}
+              className="rounded-md bg-[#DBE64C] px-3 py-1.5 text-sm font-semibold text-[#001F3F] hover:bg-[#74C365]">
               Cargar mi avance
             </button>
-            <button
-              type="button"
-              onClick={() => confirm("¿Borrar materias y requisitos?") && reiniciar()}
-              className="rounded-md border border-[#F6F7ED]/40 px-3 py-1.5 text-sm hover:bg-[#1E488F]"
-            >
+            <button type="button" onClick={() => confirm("¿Borrar materias y requisitos?") && reiniciar()}
+              className="rounded-md border border-[#F6F7ED]/40 px-3 py-1.5 text-sm hover:bg-[#1E488F]">
               Reiniciar
             </button>
           </div>
@@ -122,7 +102,9 @@ export default function Malla() {
                   motivo={motivoBloqueo(m, estados, creditosPiso)}
                   faltantes={correquisitosFaltantes(m, estados)}
                   incumplida={alertas.has(m.id)}
+                  notas={notas[m.id] ?? { b1: null, b2: null }}
                   onCambiar={(e) => cambiar(m.id, e)}
+                  onNota={(b, v) => setNota(m.id, b, v)}
                 />
               ))}
             </section>
@@ -130,8 +112,9 @@ export default function Malla() {
         </div>
 
         <p className="text-xs text-[#001F3F]/60">
-          Clic en una materia: pendiente → cursando → aprobada → pendiente. Las apagadas están bloqueadas;
-          pasa el cursor para ver el motivo.
+          Clic en una materia: pendiente → cursando → aprobada → pendiente. Al marcarla cursando o
+          aprobada aparecen los campos B1 y B2 para registrar la nota de cada bimestre (0 a 20 cada uno,
+          40 en total).
         </p>
 
         <div className="grid gap-4 lg:grid-cols-2">
@@ -140,9 +123,7 @@ export default function Malla() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <IraGrafico />
-          </div>
+          <div className="lg:col-span-2"><IraGrafico /></div>
           <Respaldo />
         </div>
 

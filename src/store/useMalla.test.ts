@@ -56,3 +56,18 @@ describe("useMalla", () => {
     expect(useMalla.getState().estados.MATD113).toBe("aprobada");
   });
 });
+
+describe("notas por bimestre", () => {
+  it("setNota guarda cada bimestre por separado", () => {
+    useMalla.getState().setNota("MATD113", "b1", 18);
+    useMalla.getState().setNota("MATD113", "b2", 19);
+    expect(useMalla.getState().notas.MATD113).toEqual({ b1: 18, b2: 19 });
+  });
+  it("exportar e importar conservan las notas", () => {
+    useMalla.getState().setNota("MATD113", "b1", 15);
+    const copia = JSON.parse(JSON.stringify(useMalla.getState().exportar()));
+    useMalla.getState().reiniciar();
+    useMalla.getState().importar(copia);
+    expect(useMalla.getState().notas.MATD113.b1).toBe(15);
+  });
+});

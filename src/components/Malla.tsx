@@ -79,11 +79,11 @@ export default function Malla() {
       </header>
 
       <main className="mx-auto max-w-[1600px] space-y-6 px-4 py-6 sm:px-6">
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex-1">
             <ProgresoCarrera aprobados={aprobados} cursando={cursando} total={135} />
           </div>
-          <IraPeriodos />
+          <Respaldo />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
@@ -122,9 +122,9 @@ export default function Malla() {
           <IraCalculadora />
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2"><IraGrafico /></div>
-          <Respaldo />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <IraPeriodos />
+          <IraGrafico />
         </div>
 
         <Requisitos />
